@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
-
 /**
  * @author UC San Diego Intermediate MOOC team
  *
@@ -17,121 +16,211 @@ public class NearbyWords implements SpellingSuggest {
 	// THRESHOLD to determine how many words to look through when looking
 	// for spelling suggestions (stops prohibitively long searching)
 	// For use in the Optional Optimization in Part 2.
-	private static final int THRESHOLD = 1000; 
+	private static final int THRESHOLD = 1000;
 
 	Dictionary dict;
 
-	public NearbyWords (Dictionary dict) 
-	{
+	public NearbyWords(Dictionary dict) {
 		this.dict = dict;
 	}
 
-	/** Return the list of Strings that are one modification away
-	 * from the input string.  
-	 * @param s The original String
-	 * @param wordsOnly controls whether to return only words or any String
+	/**
+	 * Return the list of Strings that are one modification away from the input
+	 * string.
+	 * 
+	 * @param s
+	 *            The original String
+	 * @param wordsOnly
+	 *            controls whether to return only words or any String
 	 * @return list of Strings which are nearby the original string
 	 */
-	public List<String> distanceOne(String s, boolean wordsOnly )  {
-		   List<String> retList = new ArrayList<String>();
-		   insertions(s, retList, wordsOnly);
-		   subsitution(s, retList, wordsOnly);
-		   deletions(s, retList, wordsOnly);
-		   return retList;
+	public List<String> distanceOne(String s, boolean wordsOnly) {
+		List<String> retList = new ArrayList<String>();
+		insertions(s, retList, wordsOnly);
+		subsitution(s, retList, wordsOnly);
+		deletions(s, retList, wordsOnly);
+		return retList;
 	}
 
-	
-	/** Add to the currentList Strings that are one character mutation away
-	 * from the input string.  
-	 * @param s The original String
-	 * @param currentList is the list of words to append modified words 
-	 * @param wordsOnly controls whether to return only words or any String
+	/**
+	 * Add to the currentList Strings that are one character mutation away from
+	 * the input string.
+	 * 
+	 * @param s
+	 *            The original String
+	 * @param currentList
+	 *            is the list of words to append modified words
+	 * @param wordsOnly
+	 *            controls whether to return only words or any String
 	 * @return
 	 */
 	public void subsitution(String s, List<String> currentList, boolean wordsOnly) {
 		// for each letter in the s and for all possible replacement characters
-		for(int index = 0; index < s.length(); index++){
-			for(int charCode = (int)'a'; charCode <= (int)'z'; charCode++) {
-				// use StringBuffer for an easy interface to permuting the 
+		for (int index = 0; index < s.length(); index++) {
+			for (int charCode = (int) 'a'; charCode <= (int) 'z'; charCode++) {
+				// use StringBuffer for an easy interface to permuting the
 				// letters in the String
 				StringBuffer sb = new StringBuffer(s);
-				sb.setCharAt(index, (char)charCode);
+				sb.setCharAt(index, (char) charCode);
 
-				// if the item isn't in the list, isn't the original string, and
-				// (if wordsOnly is true) is a real word, add to the list
-				if(!currentList.contains(sb.toString()) && 
-						(!wordsOnly||dict.isWord(sb.toString())) &&
-						!s.equals(sb.toString())) {
-					currentList.add(sb.toString());
-				}
+				addItem(s, sb.toString(), currentList, wordsOnly);
 			}
 		}
 	}
-	
-	/** Add to the currentList Strings that are one character insertion away
-	 * from the input string.  
-	 * @param s The original String
-	 * @param currentList is the list of words to append modified words 
-	 * @param wordsOnly controls whether to return only words or any String
+
+	/**
+	 * Add to the currentList Strings that are one character insertion away from
+	 * the input string.
+	 * 
+	 * @param s
+	 *            The original String
+	 * @param currentList
+	 *            is the list of words to append modified words
+	 * @param wordsOnly
+	 *            controls whether to return only words or any String
 	 * @return
 	 */
-	public void insertions(String s, List<String> currentList, boolean wordsOnly ) {
-		// TODO: Implement this method  
+	public void insertions(String s, List<String> currentList, boolean wordsOnly) {
+		// for each letter in the s and for all possible replacement characters
+		for (int index = 0; index < s.length() + 1; index++) {
+			for (int charCode = (int) 'a'; charCode <= (int) 'z'; charCode++) {
+				char[] originalCharacters = s.toCharArray();
+				char[] insertedCharacters = new char[originalCharacters.length + 1];
+				increaseArray(index, originalCharacters, insertedCharacters);
+
+				// Insert the element into index position
+				insertedCharacters[index] = (char) charCode;
+				String insertedString = new String(insertedCharacters);
+
+				addItem(s, insertedString, currentList, wordsOnly);
+			}
+		}
 	}
 
-	/** Add to the currentList Strings that are one character deletion away
-	 * from the input string.  
-	 * @param s The original String
-	 * @param currentList is the list of words to append modified words 
-	 * @param wordsOnly controls whether to return only words or any String
+	/**
+	 * Add to the currentList Strings that are one character deletion away from
+	 * the input string.
+	 * 
+	 * @param s
+	 *            The original String
+	 * @param currentList
+	 *            is the list of words to append modified words
+	 * @param wordsOnly
+	 *            controls whether to return only words or any String
 	 * @return
 	 */
-	public void deletions(String s, List<String> currentList, boolean wordsOnly ) {
-		// TODO: Implement this method
+	public void deletions(String s, List<String> currentList, boolean wordsOnly) {
+		for (int index = 0; index < s.length(); index++) {
+			char[] originalCharacters = s.toCharArray();
+			char[] shrinkedCharacters = new char[originalCharacters.length - 1];
+			shrinkArray(index, originalCharacters, shrinkedCharacters);
+
+			String shrinkedString = new String(shrinkedCharacters);
+
+			addItem(s, shrinkedString, currentList, wordsOnly);
+		}
 	}
 
-	/** Add to the currentList Strings that are one character deletion away
-	 * from the input string.  
-	 * @param word The misspelled word
-	 * @param numSuggestions is the maximum number of suggestions to return 
+	/**
+	 * Add to the currentList Strings that are one character deletion away from
+	 * the input string.
+	 * 
+	 * @param word
+	 *            The misspelled word
+	 * @param numSuggestions
+	 *            is the maximum number of suggestions to return
 	 * @return the list of spelling suggestions
 	 */
 	@Override
 	public List<String> suggestions(String word, int numSuggestions) {
 
 		// initial variables
-		List<String> queue = new LinkedList<String>();     // String to explore
-		HashSet<String> visited = new HashSet<String>();   // to avoid exploring the same  
-														   // string multiple times
-		List<String> retList = new LinkedList<String>();   // words to return
-		 
-		
+		List<String> queue = new LinkedList<String>(); // String to explore
+		HashSet<String> visited = new HashSet<String>(); // to avoid exploring
+															// the same
+															// string multiple
+															// times
+		List<String> retList = new LinkedList<String>(); // words to return
+
 		// insert first node
 		queue.add(word);
 		visited.add(word);
-					
-		// TODO: Implement the remainder of this method, see assignment for algorithm
-		
+
+		int incr = 0;
+		while (!queue.isEmpty() && retList.size() < numSuggestions && incr < THRESHOLD) {
+			incr++;
+			String current = queue.remove(0);
+			List<String> neighbors = distanceOne(current, true);
+			for (String neighbor : neighbors) {
+				if (!visited.contains(neighbor)) {
+					visited.add(neighbor);
+					queue.add(queue.size(), neighbor);
+					if (dict.isWord(neighbor)) {
+						retList.add(neighbor);
+					}
+				}
+			}
+		}
+
 		return retList;
+	}
 
-	}	
+	// Add words to current list
+	private void addItem(String original, String computed, List<String> currentList, boolean wordsOnly) {
+		// if the item isn't in the list, isn't the original string, and
+		// (if wordsOnly is true) is a real word, add to the list
+		if (!currentList.contains(computed) && (!wordsOnly || dict.isWord(computed)) && !original.equals(computed)) {
+			currentList.add(computed);
+		}
+	}
 
-   public static void main(String[] args) {
-	   /* basic testing code to get started
-	   String word = "i";
-	   // Pass NearbyWords any Dictionary implementation you prefer
-	   Dictionary d = new DictionaryHashSet();
-	   DictionaryLoader.loadDictionary(d, "data/dict.txt");
-	   NearbyWords w = new NearbyWords(d);
-	   List<String> l = w.distanceOne(word, true);
-	   System.out.println("One away word Strings for for \""+word+"\" are:");
-	   System.out.println(l+"\n");
+	// Copy characters from original to new array starting from the index
+	private void increaseArray(int index, char[] originalCharacters, char[] insertedCharacters) {
+		for (int i = 0; i < index; i++) {
+			insertedCharacters[i] = originalCharacters[i];
+		}
 
-	   word = "tailo";
-	   List<String> suggest = w.suggestions(word, 10);
-	   System.out.println("Spelling Suggestions for \""+word+"\" are:");
-	   System.out.println(suggest);
-	   */
-   }
+		if (originalCharacters.length != index) {
+			for (int i = index; i < originalCharacters.length; i++) {
+				insertedCharacters[i + 1] = originalCharacters[i];
+			}
+		}
+	}
+
+	// Shrink the size of the array by 1
+	private void shrinkArray(int index, char[] originalCharacters, char[] shrinkedCharacters) {
+		for (int i = 0; i < index; i++) {
+			shrinkedCharacters[i] = originalCharacters[i];
+		}
+
+		for (int i = index; i < originalCharacters.length - 1; i++) {
+			shrinkedCharacters[i] = originalCharacters[i + 1];
+		}
+	}
+
+	public static void main(String[] args) {
+		/*
+		 * basic testing code to get started String word = "i"; // Pass
+		 * NearbyWords any Dictionary implementation you prefer
+		 */
+
+		String word = "i";
+		Dictionary d = new DictionaryHashSet();
+		DictionaryLoader.loadDictionary(d, "data/dict.txt");
+		NearbyWords w = new NearbyWords(d);
+		List<String> l = w.distanceOne(word, true);
+		System.out.println("One away word Strings for for \"" + word + "\" are:");
+		System.out.println(l + "\n");
+
+		word = "tailo";
+		List<String> suggest = w.suggestions(word, 10);
+		System.out.println("Spelling Suggestions for \"" + word + "\" are:");
+		System.out.println(suggest);
+		
+		word = "kangaro";
+		suggest = w.suggestions(word, 10);
+		System.out.println("Spelling Suggestions for \"" + word + "\" are:");
+		System.out.println(suggest);
+	}
 
 }

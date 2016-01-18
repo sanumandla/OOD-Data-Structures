@@ -114,7 +114,22 @@ public class MyLinkedListTester {
 		assertEquals("Remove: check element 0 is correct ", (Integer)21, list1.get(0));
 		assertEquals("Remove: check size is correct ", 2, list1.size());
 		
-		// TODO: Add more tests here
+		try {
+			list1.remove(2);
+			fail("Supposed to fail");
+		} catch(IndexOutOfBoundsException e) {			
+		}
+		
+		try {
+			list1.remove(-1);
+			fail("Supposed to fail");
+		} catch(IndexOutOfBoundsException e) {			
+		}
+		
+		int b = list1.remove(1);
+		assertEquals("Remove: check b is correct ", 42, b);
+		assertEquals("Remove: check element 0 is correct ", (Integer)21, list1.get(0));
+		assertEquals("Remove: check size is correct ", 1, list1.size());		
 	}
 	
 	/** Test adding an element into the end of the list, specifically
@@ -123,8 +138,30 @@ public class MyLinkedListTester {
 	@Test
 	public void testAddEnd()
 	{
-        // TODO: implement this test
+		try {
+			emptyList.add(null);
+			fail("Supposed to fail");
+		} catch(NullPointerException e) {			
+		}
 		
+		boolean value = emptyList.add(10);
+		assertTrue(value);
+		assertEquals("Add: check if element is added correctly", (Integer)10, emptyList.get(0));
+		assertEquals("Add: check size is correct ", 1, emptyList.size());	
+		
+		boolean value1 = emptyList.add(20);
+		assertTrue(value1);
+		assertEquals("Add: check if element is added correctly", (Integer)20, emptyList.get(1));
+		assertEquals("Add: check size is correct ", 2, emptyList.size());
+		
+		emptyList.remove(0);
+		assertEquals("Add: check if element is added correctly", (Integer)20, emptyList.get(0));
+		assertEquals("Add: check size is correct ", 1, emptyList.size());
+		
+		boolean value2 = emptyList.add(10);
+		assertTrue(value2);
+		assertEquals("Add: check if element is added correctly", (Integer)10, emptyList.get(1));
+		assertEquals("Add: check size is correct ", 2, emptyList.size());
 	}
 
 	
@@ -132,7 +169,16 @@ public class MyLinkedListTester {
 	@Test
 	public void testSize()
 	{
-		// TODO: implement this test
+		MyLinkedList<Integer> mylist = new MyLinkedList<Integer>();
+		assertEquals("Size: check size is correct ", 0, mylist.size());
+		
+		mylist.add(10);
+		mylist.add(20);
+		assertEquals("Size: check size is correct ", 2, mylist.size());
+		
+		mylist.remove(0);
+		mylist.remove(0);
+		assertEquals("Size: check size is correct ", 0, mylist.size());
 	}
 
 	
@@ -144,16 +190,83 @@ public class MyLinkedListTester {
 	@Test
 	public void testAddAtIndex()
 	{
-        // TODO: implement this test
+		try {
+			emptyList.add(0, null);
+			fail("Supposed to fail");
+		} catch(NullPointerException e) {			
+		}
 		
+		try {
+			emptyList.add(-1, 10);
+			fail("Supposed to fail");
+		} catch(IndexOutOfBoundsException e) {			
+		}
+		
+		try {
+			emptyList.add(2, 10);
+			fail("Supposed to fail");
+		} catch(IndexOutOfBoundsException e) {			
+		}
+		
+		emptyList.add(0, 10);		
+		assertEquals("Add: check if element is added correctly", (Integer)10, emptyList.get(0));
+		assertEquals("Add: check size is correct ", 1, emptyList.size());	
+		
+		emptyList.add(0, 20);
+		assertEquals("Add: check if element is added correctly", (Integer)10, emptyList.get(1));
+		assertEquals("Add: check size is correct ", 2, emptyList.size());
+		
+		emptyList.remove(0);
+		assertEquals("Add: check if element is added correctly", (Integer)10, emptyList.get(0));
+		assertEquals("Add: check size is correct ", 1, emptyList.size());
+		
+		boolean value2 = emptyList.add(30);
+		assertTrue(value2);
+		assertEquals("Add: check if element is added correctly", (Integer)30, emptyList.get(1));
+		assertEquals("Add: check size is correct ", 2, emptyList.size());	
+		
+		emptyList.add(1, 40);		
+		assertEquals("Add: check if element is added correctly", (Integer)40, emptyList.get(1));
+		assertEquals("Add: check size is correct ", 3, emptyList.size());		
 	}
 	
 	/** Test setting an element in the list */
 	@Test
 	public void testSet()
 	{
-	    // TODO: implement this test
-	    
+		try {
+			emptyList.set(0, 10);
+			fail("Supposed to fail");
+		} catch(IndexOutOfBoundsException e) {			
+		}
+		
+		try {
+			emptyList.set(-1, 10);
+			fail("Supposed to fail");
+		} catch(IndexOutOfBoundsException e) {			
+		}
+		
+		try {
+			emptyList.set(2, 10);
+			fail("Supposed to fail");
+		} catch(IndexOutOfBoundsException e) {			
+		}		
+		
+		try {
+			shortList.set(0, null);
+			fail("Supposed to fail");
+		} catch(NullPointerException e) {			
+		}		
+	    		
+		String data = shortList.set(0, "A1");
+		assertEquals("Add: check if element is added correctly", (String) "A", data);
+		assertEquals("Add: check if element is added correctly", (String) "A1", shortList.get(0));
+		assertEquals("Add: check size is correct ", 2, shortList.size());
+		
+		String data1 = shortList.set(1, "B1");
+		assertEquals("Add: check if element is added correctly", (String) "B", data1);
+		assertEquals("Add: check if element is added correctly", (String) "B1", shortList.get(1));
+		assertEquals("Add: check size is correct ", 2, shortList.size());
 	}
 	
 	

@@ -38,7 +38,8 @@ public class MarkovTextGeneratorGrader {
 
             feedback += "\nGenerator produced: " + res + "\n";
 
-            String[] words = res.split("[\\s]+");
+            String[] words = res.split("[\\s]+");            
+            
             feedback += "\n** Test #3: Checking requested generator word count...";
             feedback += "Your generator produced " + words.length + " words. ";
 
